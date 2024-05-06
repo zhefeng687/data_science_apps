@@ -57,8 +57,10 @@ driver.quit()
 # Parse the HTML content
 soup = bs4(html_content, 'html.parser')
 
+
 # Find the table within the HTML content using id
 table_html = soup.find('table', id='stats_keeper_adv')
+
 
 # Check if the table is found
 if table_html:
@@ -82,4 +84,40 @@ for i, df in enumerate(dfs):
     print(f"DataFrame {i}:\n{df}")
 
 
-df.info()
+# tweak the data
+# remove dup row and drop unwanted multi-level cols 
+goalkeeper_stats=(df
+.drop(25, inplace=True) 
+.drop(columns=[('Unnamed: 0_level_0','Rk'), ('Unnamed: 2_level_0','Nation'), ('Unnamed: 3_level_0','Pos'),
+                 ('Unnamed: 5_level_0','Age'), ('Unnamed: 6_level_0','Born'), ('Unnamed: 33_level_0',  'Matches')],
+                 inplace=True)
+)
+
+
+# flatten the cols with mulitilevel index
+# rename the first 3 cols
+# convert the undesired dtype
+def flatten_cols(df_):
+    cols = ['_'.join(cs) for cs in df_.columns.to_flat_index()]
+    df_.columns = cols 
+    return df_
+
+def convert_col_type(df_):    
+    for col in df_.columns:
+        df_[col] = pd.to_numeric(df_[col], errors = 'coerce')
+    return df_
+
+
+goalkeeper_stats_p1= (goalkeeper_stats
+.pipe(flatten_cols)
+.rename(columns={'Unnamed: 1_level_0_Player': 'Player', \
+                 'Unnamed: 4_level_0_Squad': 'Squad', \
+                 'Unnamed: 7_level_0_90s': '90s'})
+)
+
+goalkeeper_stats_p2= (goalkeeper_stats
+.iloc[:, 2:]
+.pipe(convert_col_type)
+)
+
+goalkeeper_stats =goalkeeper_stats_p1.assign(**goalkeeper_stats_p2)
