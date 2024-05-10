@@ -4,6 +4,6 @@ python + streamlit lib
 
 * how to run apps on streamlit?
    * run commend in terminal:
-   * streamlit run c:/Users/fengz/OneDrive/Documents/data_science_apps/*app name*
+   * streamlit run your local path/*app name*
 * example:
    * streamlit run c:/Users/fengz/OneDrive/Documents/data_science_apps/stockprice_app.py
