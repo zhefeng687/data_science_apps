@@ -2,12 +2,16 @@ import streamlit as st
 import base64
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as pt
+import matplotlib.pyplot as plt
 import seaborn as sns 
 import requests
 from bs4 import BeautifulSoup as bs4
 from selenium import webdriver
+from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.chrome.options import Options
 from io import StringIO
+
+
 
 
 st.title('Premier League Player Advanced Goalkeeping 2023-2024')
@@ -24,7 +28,7 @@ This app performs simple webscraping of Premier League Player Advanced Goalkeepi
 
 # design sidebar input
 st.sidebar.header('User Input Features')
-url="https://fbref.com/en/comps/9/keepersadv/Premier-League-Stats"
+url= 'https://fbref.com/en/comps/9/keepersadv/Premier-League-Stats'
 
 website = st.text_input("URL", url)
 
@@ -36,8 +40,16 @@ website = st.text_input("URL", url)
 def load_web_data(link):
     # Use raw string for Windows paths      
     chromedriver_path = r"C:\Windows\System32\chromedriver.exe"
-    driver = webdriver.Chrome(chromedriver_path)
+
+    # Set Chrome options
+    chrome_options = Options()
+    chrome_options.add_argument("--headless")  # Run Chrome in headless mode
+
+    # Create a new Chrome webdriver with the specified options
+    service = Service(chromedriver_path)
+    driver = webdriver.Chrome(service=service, options=chrome_options)
     driver.get(link)
+
 
     # Get the page source after JavaScript execution
     html_content = driver.page_source
@@ -121,7 +133,25 @@ if goalkeeper_stats is not None:
 
     # Filtering data
     df_selected_squad = goalkeeper_stats[goalkeeper_stats.Squad.isin(selected_squad)]
+    
 
     st.header('Display Goalkeeper Stats of Selected Squad(s)')
     st.write('Data Dimension: ' + str(df_selected_squad.shape[0]) + ' rows and ' + str(df_selected_squad.shape[1]) + ' columns.')
     st.dataframe(df_selected_squad)
+
+
+    def filedownload(df):
+        csv = df.to_csv(index=False)
+        # Ensure proper encoding
+        # strings <-> bytes conversions
+        b64 = base64.b64encode(csv.encode('utf-8')).decode()  
+        href = f'<a href="data:file/csv;base64,{b64}" download="goalkeeper_stats.csv">Download CSV File</a>'
+        return href
+
+    st.markdown(filedownload(df_selected_squad), unsafe_allow_html=True)
+
+else:
+    st.error("Failed to load data from the provided URL.")
+
+
+
