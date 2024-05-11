@@ -11,7 +11,7 @@ from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
 from webdriver_manager.chrome import ChromeDriverManager
 from io import StringIO
-import os
+
 
 
 
@@ -35,22 +35,10 @@ url= 'https://fbref.com/en/comps/9/keepersadv/Premier-League-Stats'
 website = st.text_input("URL", url)
 
 
-@st.cache_data
-def install_chrome():
-    os.system('wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb')
-    os.system('sudo apt-get update')
-    os.system('sudo apt-get install -y ./google-chrome-stable_current_amd64.deb')
-    os.system('sudo apt-get -f install -y')
-    os.system('sudo apt-get install -y libnss3 libxss1 libappindicator1 libindicator7')
-    os.system('sudo apt-get install -y fonts-liberation libasound2 libnspr4 libnss3 xdg-utils')
-    os.system('google-chrome --version')
-
-
 # web scraping of PL GK stats
 @st.cache_data
 
 def load_web_data(link):
-    install_chrome()
     # Use raw string for Windows paths      
     # chromedriver_path = r"C:\Windows\System32\chromedriver.exe"
 
@@ -60,16 +48,12 @@ def load_web_data(link):
     chrome_options.add_argument('--no-sandbox')
     chrome_options.add_argument('--headless') # Run Chrome in headless mode
     chrome_options.add_argument('--disable-dev-shm-usage')
-    chrome_options.add_argument('--disable-gpu')
-    chrome_options.add_argument('--window-size=1920x1080')
-   
+
 
     # Install ChromeDriver and set path
     chrome_driver_path = ChromeDriverManager().install()
     service = Service(chrome_driver_path)
 
-    # Ensure the chromedriver binary is executable
-    os.system(f'chmod +x {chrome_driver_path}')
     
     # Create a new Chrome webdriver with the specified options using the explicitly set path
     driver = webdriver.Chrome(service=service, options=chrome_options)
