@@ -9,7 +9,9 @@ from bs4 import BeautifulSoup as bs4
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
+from webdriver_manager.chrome import ChromeDriverManager
 from io import StringIO
+import os
 
 
 
@@ -32,6 +34,13 @@ url= 'https://fbref.com/en/comps/9/keepersadv/Premier-League-Stats'
 
 website = st.text_input("URL", url)
 
+
+@st.cache_data
+def install_chrome():
+    os.system('wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb')
+    os.system('sudo dpkg -i google-chrome-stable_current_amd64.deb')
+    os.system('sudo apt-get -f install')
+    os.system('google-chrome --version')
     
 # web scraping of PL GK stats
 @st.cache_data
@@ -39,14 +48,25 @@ website = st.text_input("URL", url)
 
 def load_web_data(link):
     # Use raw string for Windows paths      
-    chromedriver_path = r"C:\Windows\System32\chromedriver.exe"
+    # chromedriver_path = r"C:\Windows\System32\chromedriver.exe"
 
     # Set Chrome options
     chrome_options = Options()
-    chrome_options.add_argument("--headless")  # Run Chrome in headless mode
+    # chrome_options = webdriver.ChromeOptions()
+    chrome_options.add_argument('--no-sandbox')
+    chrome_options.add_argument('--headless') # Run Chrome in headless mode
+    chrome_options.add_argument('--disable-dev-shm-usage')
+    chrome_options.add_argument('--disable-gpu')
+    chrome_options.add_argument('--window-size=1920x1080')
+   
 
     # Create a new Chrome webdriver with the specified options
-    service = Service(chromedriver_path)
+    # service = Service(chromedriver_path)
+    # Create a new Chrome webdriver with the specified options using webdriver-manager
+    # service = Service(ChromeDriverManager().install())
+    
+    chrome_driver_path = ChromeDriverManager().install()
+    service = Service(chrome_driver_path)
     driver = webdriver.Chrome(service=service, options=chrome_options)
     driver.get(link)
 
