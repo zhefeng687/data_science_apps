@@ -7,3 +7,4 @@ beautifulsoup4==4.12.3
 requests==2.31.0
 numpy==1.26.4
 yfinance==0.2.38
+webdriver-manager==3.5.2
