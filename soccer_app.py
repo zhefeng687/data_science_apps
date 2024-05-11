@@ -35,7 +35,7 @@ url= 'https://fbref.com/en/comps/9/keepersadv/Premier-League-Stats'
 website = st.text_input("URL", url)
 
 
-@st.cache_data(allow_output_mutation=True)
+@st.cache_data
 def install_chrome():
     os.system('wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb')
     os.system('sudo apt-get update')
@@ -47,7 +47,7 @@ def install_chrome():
 
 
 # web scraping of PL GK stats
-@st.cache_data(allow_output_mutation=True)
+@st.cache_data
 
 def load_web_data(link):
     install_chrome()
