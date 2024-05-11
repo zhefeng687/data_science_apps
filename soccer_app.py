@@ -36,10 +36,11 @@ website = st.text_input("URL", url)
 
 
 @st.cache_data
-def install_chrome():
+def install_dependencies():
     os.system('wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb')
-    os.system('sudo dpkg -i google-chrome-stable_current_amd64.deb')
-    os.system('sudo apt-get -f install')
+    os.system('sudo apt-get update')
+    os.system('sudo apt-get install -y ./google-chrome-stable_current_amd64.deb')
+    os.system('sudo apt-get -f install -y')
     os.system('google-chrome --version')
     
 # web scraping of PL GK stats
