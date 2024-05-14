@@ -75,10 +75,9 @@ def load_web_data(link):
     table_html = soup.find('table', id='stats_keeper_adv')
 
     # Check if the table is found
-    if table_html:
-        print("Table found!")
-    else:
-        print("Warning: Table not found!")
+    if not table_html:
+        st.warning("Warning: Table not found!")
+        return None
 
     # To address the FutureWarning about passing literal HTML to read_html, 
     # Convert the table HTML to a string
@@ -87,21 +86,20 @@ def load_web_data(link):
     html_io = StringIO(table_html_str)
     dfs = pd.read_html(html_io)
 
-    if dfs:
-        df = dfs[0]
-
-    else:
-        print("Warning: No DataFrames found!")
+    if not dfs:
+        st.warning("Warning: No DataFrames found!")
         return None
+    
+    df=dfs[0]
     
     # tweak the data
     # remove dup row and drop unwanted multi-level cols 
-    raw=(df
-         .drop(25, inplace=False) 
-         .drop(columns=[('Unnamed: 0_level_0','Rk'), ('Unnamed: 2_level_0','Nation'), ('Unnamed: 3_level_0','Pos'),
-                    ('Unnamed: 5_level_0','Age'), ('Unnamed: 6_level_0','Born'), ('Unnamed: 33_level_0',  'Matches')],
-                inplace=False)
-        )
+    raw=df.drop(25, inplace=False).drop(columns=[
+        ('Unnamed: 0_level_0','Rk'), ('Unnamed: 2_level_0','Nation'), 
+        ('Unnamed: 3_level_0','Pos'),('Unnamed: 5_level_0','Age'), 
+        ('Unnamed: 6_level_0','Born'), ('Unnamed: 33_level_0', 'Matches')],
+        inplace=False)
+
 
     # flatten the cols with mulitilevel index
     # rename the first 3 cols
@@ -117,19 +115,16 @@ def load_web_data(link):
         return df_
 
 
-    raw1= (raw
-           .pipe(flatten_cols)
-           .rename(columns={'Unnamed: 1_level_0_Player': 'Player', 
-                            'Unnamed: 4_level_0_Squad': 'Squad', 
-                            'Unnamed: 7_level_0_90s': '90s'})
-          )
+    raw1= raw.pipe(flatten_cols).rename(columns=
+        {'Unnamed: 1_level_0_Player': 'Player', 
+         'Unnamed: 4_level_0_Squad': 'Squad', 
+         'Unnamed: 7_level_0_90s': '90s'})
 
-    raw2= (raw1
-           .iloc[:, 2:]
-          .pipe(convert_col_type)
-          )
+
+    raw2= raw1.iloc[:, 2:].pipe(convert_col_type)
 
     goalkeeper_stats = raw1.assign(**raw2)
+
     return goalkeeper_stats
 
 
@@ -146,7 +141,7 @@ if goalkeeper_stats is not None:
     
 
     st.header('Display Goalkeeper Stats of Selected Squad(s)')
-    st.write('Data Dimension: ' + str(df_selected_squad.shape[0]) + ' rows and ' + str(df_selected_squad.shape[1]) + ' columns.')
+    st.write(f'Data Dimension: {df_selected_squad.shape[0]} rows and {df_selected_squad.shape[1]} columns.')
     st.dataframe(df_selected_squad)
 
 
