@@ -2,8 +2,6 @@ import streamlit as st
 import base64
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
-import seaborn as sns 
 import requests
 from bs4 import BeautifulSoup as bs4
 from selenium import webdriver
@@ -12,7 +10,7 @@ from selenium.webdriver.chrome.options import Options
 from webdriver_manager.chrome import ChromeDriverManager
 from io import StringIO
 
-
+pd.options.mode.copy_on_write=True
 
 
 
@@ -45,9 +43,9 @@ def load_web_data(link):
     # Setup Chrome options
     chrome_options = Options()
     # chrome_options = webdriver.ChromeOptions()
-    chrome_options.add_argument('--no-sandbox')
-    chrome_options.add_argument('--headless') # Run Chrome in headless mode
-    chrome_options.add_argument('--disable-dev-shm-usage')
+    # chrome_options.add_argument('--no-sandbox')
+    # chrome_options.add_argument('--headless') # Run Chrome in headless mode
+    # chrome_options.add_argument('--disable-dev-shm-usage')
 
 
     # Install ChromeDriver and set path
